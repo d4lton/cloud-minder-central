@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo systemctl stop cloud-minder-central
+
 NODE=`which node`
 
 npm install

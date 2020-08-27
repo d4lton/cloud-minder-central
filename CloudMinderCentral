@@ -22,6 +22,26 @@ app.get("/host/:hostname", (req, res, next) => {
   }
 });
 
+app.post("/host/:hostname/poweroff", (req, res, next) => {
+  const hostname = req.params['hostname'];
+  const host = knownMinders[hostname];
+  if (host) {
+    if (host.interface) {
+      fetch(`http://${host.interface.address}:2112/poweroff`, {method: 'POST', headers: {'Content-Type': 'application/json'}})
+        .then(it => it.json())
+        .then(data => {
+          console.log(data);
+        })
+        .catch(error => {});
+      res.json(host);
+    } else {
+      res.status(422).send('{"error":"older version of CloudMinder running on host"}');
+    }
+  } else {
+    res.sendStatus(404);
+  }
+});
+
 app.post("/ping", (req, res, next) => {
   const data = req.body;
   data.lastping = Date.now();
