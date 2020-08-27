@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+
+const os = require('os');
+const express = require('express');
+const app = express();
+
+const knownMinders = {};
+
+app.use(express.json());
+app.listen(2112, () => {});
+
+app.get("/host", (req, res, next) => {
+  res.json(Object.values(knownMinders));
+});
+
+app.get("/host/:hostname", (req, res, next) => {
+  const hostname = req.params['hostname'];
+  if (knownMinders[hostname]) {
+    res.json(knownMinders[hostname]);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+app.post("/ping", (req, res, next) => {
+  const data = req.body;
+  data.lastping = Date.now();
+  data.up = true;
+  knownMinders[data.hostname] = data;
+});
+
+setInterval(() => {
+  const now = Date.now();
+  Object.values(knownMinders).forEach(host => {
+    if (now - host.lastping > 120000) { host.up = false }
+  });
+}, 10000);

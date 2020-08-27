@@ -1,0 +1,10 @@
+[Unit]
+Description=CloudMinderCentral
+After=network.target
+[Service]
+User=__USER__
+WorkingDirectory=__PWD__
+ExecStart=__NODE__ CloudMinderCentral
+[Install]
+WantedBy=multi-user.target
+
